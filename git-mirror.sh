@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# git-mirror.sh
+# Mirrors public GitHub repos for a user into a Gitea instance using the migration API. 
+# Configuration is read from config.json (see config_example.json).
+
+CONFIG_FILE="config.json"
+
+if [ ! -f "$CONFIG_FILE" ]; then
+  echo "Missing ${CONFIG_FILE}. Copy config_example.json to ${CONFIG_FILE} and fill in values." >&2
+  exit 2
+fi
+
+if ! command -v jq >/dev/null 2>&1; then
+  echo "jq is required to read ${CONFIG_FILE}." >&2
+  exit 2
+fi
+
+if ! command -v curl >/dev/null 2>&1; then
+  echo "curl is required." >&2
+  exit 2
+fi
+
+# Load configuration values from config.json
+GH_USER=$(jq -r '.GH_USER // empty' "$CONFIG_FILE")
+GITEA_URL=$(jq -r '.GITEA_URL // empty' "$CONFIG_FILE")
+GITEA_USER=$(jq -r '.GITEA_USER // empty' "$CONFIG_FILE")
+GITEA_TOKEN=$(jq -r '.GITEA_TOKEN // empty' "$CONFIG_FILE")
+
+if [ -z "$GH_USER" ] || [ -z "$GITEA_URL" ] || [ -z "$GITEA_TOKEN" ]; then
+  echo "Please set GH_USER, GITEA_URL and GITEA_TOKEN in ${CONFIG_FILE}." >&2
+  exit 2
+fi
+
+echo "Fetching existing Gitea repositories..."
+
+GITEA_REPOS=$(curl -s \
+  -H "Authorization: token ${GITEA_TOKEN}" \
+  "${GITEA_URL}/api/v1/user/repos?limit=1000" \
+  | jq -r '.[].name')
+
+repo_exists() {
+  echo "$GITEA_REPOS" | grep -qx "$1"
+}
+
+echo "Fetching public GitHub repositories for ${GH_USER}..."
+
+page=1
+MIRRORED=0
+while :; do
+  REPOS=$(curl -s "https://api.github.com/users/${GH_USER}/repos?per_page=100&page=${page}")
+
+  # Detect GitHub API error (e.g., rate limit, not found)
+  if echo "$REPOS" | jq -e 'has("message")' >/dev/null 2>&1; then
+    MSG=$(echo "$REPOS" | jq -r '.message')
+    echo "GitHub API error: $MSG" >&2
+    exit 3
+  fi
+
+  COUNT=$(echo "$REPOS" | jq length)
+  [ "$COUNT" -eq 0 ] && break
+
+  echo "$REPOS" | jq -c '.[]' | while read -r repo; do
+    NAME=$(echo "$repo" | jq -r '.name')
+    CLONE_URL=$(echo "$repo" | jq -r '.clone_url')
+
+    if repo_exists "$NAME"; then
+      echo "Skipping $NAME (already exists)"
+      continue
+    fi
+
+    echo "Creating mirror for $NAME..."
+
+    curl -s -X POST \
+      -H "Authorization: token ${GITEA_TOKEN}" \
+      -H "Content-Type: application/json" \
+      "${GITEA_URL}/api/v1/repos/migrate" \
+      -d "{
+        \"clone_addr\": \"${CLONE_URL}\",
+        \"repo_name\": \"${NAME}\",
+        \"mirror\": true,
+        \"private\": false,
+        \"service\": \"git\"
+      }" > /dev/null
+
+    printf '\033[32m✓\033[0m Mirrored %s\n' "$NAME"
+    MIRRORED=$((MIRRORED + 1))
+  done
+
+  ((page++))
+done
+
+echo "" # Create a blank line before the summary
+
+if [ "$MIRRORED" -eq 0 ]; then
+  echo "No repositories were mirrored."
+elif [ "$MIRRORED" -eq 1 ]; then
+  echo "Mirrored 1 Repository"
+else
+  echo "Mirrored ${MIRRORED} Repositories"
+fi
+
+echo "Done."
+
+exit 0

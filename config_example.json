@@ -1,0 +1,6 @@
+{
+  "GH_USER": "your_github_username",
+  "GITEA_URL": "https://git.example.com",
+  "GITEA_USER": "your_gitea_username",
+  "GITEA_TOKEN": "gitea_xxxxxxxxxxxxx"
+}
