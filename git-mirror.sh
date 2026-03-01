@@ -64,6 +64,12 @@ while :; do
   echo "$REPOS" | jq -c '.[]' | while read -r repo; do
     NAME=$(echo "$repo" | jq -r '.name')
     CLONE_URL=$(echo "$repo" | jq -r '.clone_url')
+    IS_FORK=$(echo "$repo" | jq -r '.fork')
+
+    if [ "$IS_FORK" = "true" ]; then
+      echo "Skipping $NAME (fork)"
+      continue
+    fi
 
     if repo_exists "$NAME"; then
       echo "Skipping $NAME (already exists)"
