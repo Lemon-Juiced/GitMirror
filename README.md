@@ -24,8 +24,9 @@ Example `config.json`:
   `bash git-mirror.sh`  
 - Dry-run test (fetches public repos and prints names):  
   `bash git-mirror-ghtest.sh <github_username>`  
-
-If you omit `<github_username>` the test script will read `GH_USER` from `config.json`.  
+  If you omit `<github_username>` the test script will read `GH_USER` from `config.json`.  
+- Sync all mirrored repositories for a user on Gitea:  
+  `bash gitea_sync_all.sh`
 
 ## Tests
 `git-mirror-ghtest.sh` queries the GitHub API for a user's public repositories and prints each repo name (e.g. `✓ Found <repo-name>`).  
