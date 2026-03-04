@@ -23,11 +23,13 @@ Example `config.json`:
 ```
 
 ## Usage
+- Set all programs in this repository as executable:  
+  `bash chmodder.sh`  
 - Mirror repositories (creates mirrors on the configured Gitea):  
   `bash git-mirror.sh`  
 - Dry-run test (fetches public repos and prints names):  
-  `bash git-mirror-ghtest.sh <github_username>`  
-  If you omit `<github_username>` the test script will read `GH_USER` from `config.json`.  
+  `bash git-mirror-ghtest.sh <github_usernames>`  
+  If you omit `<github_usernames>` the test script will read `GH_USERS` from `config.json`.  
 - Sync all mirrored repositories for a user on Gitea:  
   `bash gitea_sync_all.sh`
 
