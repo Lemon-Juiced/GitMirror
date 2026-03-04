@@ -12,7 +12,10 @@ The tools are configured via `config.json`. An example is provided in `config_ex
 Example `config.json`:  
 ```json
 {  
-  "GH_USER": "your_github_username",  
+  "GH_USERS": [
+    "your_github_username0",
+    "your_github_username1"
+  ],
   "GITEA_URL": "https://git.example.com",  
   "GITEA_USER": "your_gitea_username",  
   "GITEA_TOKEN": "gitea_xxxxxxxxxxxxx"  
