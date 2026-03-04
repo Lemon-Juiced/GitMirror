@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Simple Dry-Run test: fetch public repos for a GitHub user and print names
-# Resolve users from (in order): script arguments, config.json GH_USERS array, config.json GH_USER
+# Resolve users from (in order): script arguments, config.json GH_USERS array
 CONFIG_FILE="config.json"
 USERS=()
 
@@ -14,18 +14,12 @@ else
 	if [ -f "$CONFIG_FILE" ] && command -v jq >/dev/null 2>&1; then
 		if jq -e 'has("GH_USERS")' "$CONFIG_FILE" >/dev/null 2>&1; then
 			mapfile -t USERS < <(jq -r '.GH_USERS[]' "$CONFIG_FILE" 2>/dev/null || true)
-		else
-			# Fallback to single GH_USER key
-			single=$(jq -r '.GH_USER // empty' "$CONFIG_FILE" 2>/dev/null || true)
-			if [ -n "$single" ]; then
-				USERS=("$single")
-			fi
 		fi
 	fi
 fi
 
 if [ "${#USERS[@]}" -eq 0 ]; then
-	echo "Usage: $0 <github-username>...  (or add GH_USERS array or GH_USER to config.json)" >&2
+	echo "Usage: $0 <github-username>...  (or add GH_USERS array to config.json)" >&2
 	exit 2
 fi
 
