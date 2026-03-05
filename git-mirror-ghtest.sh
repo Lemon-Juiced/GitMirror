@@ -33,6 +33,20 @@ if ! command -v jq >/dev/null 2>&1; then
 	exit 2
 fi
 
+# Read exclude list from config.json (if present)
+EXCLUDES=()
+if [ -f "$CONFIG_FILE" ] && command -v jq >/dev/null 2>&1; then
+    if jq -e 'has("GH_EXCLUDE_REPOS")' "$CONFIG_FILE" >/dev/null 2>&1; then
+        mapfile -t EXCLUDES < <(jq -r '.GH_EXCLUDE_REPOS[]' "$CONFIG_FILE" 2>/dev/null || true)
+    fi
+fi
+
+# Normalize exclude entries (strip trailing .git for comparison)
+EXCLUDES_NORM=()
+for e in "${EXCLUDES[@]}"; do
+    EXCLUDES_NORM+=("${e%.git}")
+done
+
 # Function: check public repos for a single user
 check_user() {
 		local USERNAME="$1"
@@ -59,12 +73,38 @@ check_user() {
 				COUNT=$(echo "$FILTERED" | jq length)
 				[ "$COUNT" -eq 0 ] && break
 
-				# Print the names of the repositories found on this page with a green checkmark
-				echo "$FILTERED" | jq -r '.[].name' | while read -r NAME; do
-						printf '\033[32m✓\033[0m Found %s\n' "$NAME"
-				done
+				# Iterate repositories on this page, respecting excludes
+				local excluded_count=0
+				while read -r repojson; do
+					name=$(echo "$repojson" | jq -r '.name // empty')
+					clone_url=$(echo "$repojson" | jq -r '.clone_url // empty')
+					html_url=$(echo "$repojson" | jq -r '.html_url // empty')
 
-				TOTAL=$((TOTAL + COUNT))
+					# Normalize urls for comparison (strip .git)
+					clone_norm="${clone_url%.git}"
+					html_norm="${html_url%.git}"
+
+					# Check excludes
+					excluded=false
+					for ex in "${EXCLUDES_NORM[@]}"; do
+						if [ -n "$ex" ] && { [ "$ex" = "$clone_norm" ] || [ "$ex" = "$html_norm" ]; }; then
+							excluded=true
+							break
+						fi
+					done
+
+					if [ "$excluded" = true ]; then
+						# Yellow highlight for excluded repos
+						printf '\033[33m!\033[0m Excluding %s (%s)\n' "$name" "${clone_url:-$html_url}"
+						excluded_count=$((excluded_count+1))
+						continue
+					fi
+
+					# Not excluded: print green check and count
+					printf '\033[32m✓\033[0m Found %s\n' "$name"
+					TOTAL=$((TOTAL + 1))
+				done < <(echo "$FILTERED" | jq -c '.[]')
+
 				((page++))
 		done
 

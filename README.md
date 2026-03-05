@@ -16,6 +16,10 @@ Example `config.json`:
     "your_github_username0",
     "your_github_username1"
   ],
+  "GH_EXCLUDE_REPOS": [
+    "repo-to-exclude0",
+    "repo-to-exclude1"
+  ],
   "GITEA_URL": "https://git.example.com",  
   "GITEA_USER": "your_gitea_username",  
   "GITEA_TOKEN": "gitea_xxxxxxxxxxxxx"  
