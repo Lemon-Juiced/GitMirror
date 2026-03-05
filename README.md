@@ -38,8 +38,14 @@ Example `config.json`:
   `bash gitea_sync_all.sh`
 
 ## Tests
-`git-mirror-ghtest.sh` queries the GitHub API for a user's public repositories and prints each repo name (e.g. `✓ Found <repo-name>`).  
-The test does not perform cloning or mirroring.  
+`git-mirror-ghtest.sh` is a dry-run check for the mirror input set. It:  
+- Reads users from script arguments, or from `GH_USERS` in `config.json` when no arguments are provided  
+- Queries each user's public repositories from the GitHub API  
+- Skips forked repositories  
+- Skips repositories listed in `GH_EXCLUDE_REPOS` (prints `! Excluding <repo> ...`)  
+- Prints non-excluded repositories as `✓ Found <repo-name>`  
+
+It does **not** clone, create, or sync mirrors in Gitea.  
 
 ## Notes
 - The GitHub API has rate limits for unauthenticated requests, so this can fail.  

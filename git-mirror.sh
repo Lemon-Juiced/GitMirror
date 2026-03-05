@@ -24,6 +24,7 @@ fi
 
 # Load configuration values from config.json
 mapfile -t GH_USERS < <(jq -r '.GH_USERS[]?' "$CONFIG_FILE")
+mapfile -t GH_EXCLUDE_REPOS < <(jq -r '.GH_EXCLUDE_REPOS[]?' "$CONFIG_FILE")
 GITEA_URL=$(jq -r '.GITEA_URL // empty' "$CONFIG_FILE")
 GITEA_USER=$(jq -r '.GITEA_USER // empty' "$CONFIG_FILE")
 GITEA_TOKEN=$(jq -r '.GITEA_TOKEN // empty' "$CONFIG_FILE")
@@ -32,6 +33,12 @@ if [ "${#GH_USERS[@]}" -eq 0 ] || [ -z "$GITEA_URL" ] || [ -z "$GITEA_TOKEN" ]; 
   echo "Please set GH_USERS, GITEA_URL and GITEA_TOKEN in ${CONFIG_FILE}." >&2
   exit 2
 fi
+
+# Normalize excluded repository URLs for comparison (strip trailing .git)
+GH_EXCLUDE_REPOS_NORM=()
+for excluded_repo in "${GH_EXCLUDE_REPOS[@]}"; do
+  GH_EXCLUDE_REPOS_NORM+=("${excluded_repo%.git}")
+done
 
 echo "Fetching existing Gitea repositories..."
 
@@ -65,7 +72,24 @@ for GH_USER in "${GH_USERS[@]}"; do
     while read -r repo; do
       NAME=$(echo "$repo" | jq -r '.name')
       CLONE_URL=$(echo "$repo" | jq -r '.clone_url')
+      HTML_URL=$(echo "$repo" | jq -r '.html_url')
       IS_FORK=$(echo "$repo" | jq -r '.fork')
+
+      CLONE_URL_NORM="${CLONE_URL%.git}"
+      HTML_URL_NORM="${HTML_URL%.git}"
+
+      EXCLUDED=false
+      for excluded_repo in "${GH_EXCLUDE_REPOS_NORM[@]}"; do
+        if [ -n "$excluded_repo" ] && { [ "$excluded_repo" = "$CLONE_URL_NORM" ] || [ "$excluded_repo" = "$HTML_URL_NORM" ]; }; then
+          EXCLUDED=true
+          break
+        fi
+      done
+
+      if [ "$EXCLUDED" = true ]; then
+        echo "Skipping $NAME (excluded)"
+        continue
+      fi
 
       if [ "$IS_FORK" = "true" ]; then
         echo "Skipping $NAME (fork)"
