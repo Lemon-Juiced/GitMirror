@@ -36,6 +36,11 @@ Example `config.json`:
   If you omit `<github_usernames>` the test script will read `GH_USERS` from `config.json`.  
 - Sync all mirrored repositories for a user on Gitea:  
   `bash gitea_sync_all.sh`
+- Remove mirror repos that no longer exist on GitHub:
+  `bash gitea-prune-orphans.sh`
+- Preview orphan mirror deletions without deleting anything:
+  `bash gitea-prune-orphans.sh --dry`
+  By default, the script reads `config.json` from the same directory as the script.
 
 ## Tests
 `git-mirror-ghtest.sh` is a dry-run check for the mirror input set. It:  
