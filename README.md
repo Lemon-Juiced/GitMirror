@@ -55,3 +55,13 @@ It does **not** clone, create, or sync mirrors in Gitea.
 ## Notes
 - The GitHub API has rate limits for unauthenticated requests, so this can fail.  
 - Keep `GITEA_TOKEN` secret — **DO NOT** commit it to version control. (This is why config.json is in .gitignore).
+  
+### Optional: Man Pages
+The primary way to use Git Mirror is still running the scripts directly as shown above.
+Man pages are available as an optional convenience for users who prefer `man` documentation.
+
+- Man page sources are in `man/man1/`.
+- Quick preview without installing:
+  `man -l man/man1/git-mirror.sh.1`
+- Optional local install (Linux):
+  `sudo install -m 0644 man/man1/*.1 /usr/local/share/man/man1/ && sudo mandb`

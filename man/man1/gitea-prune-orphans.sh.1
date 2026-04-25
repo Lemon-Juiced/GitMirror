@@ -1,0 +1,48 @@
+.TH GITEA-PRUNE-ORPHANS.SH 1 "2026-04-25" "GitMirror" "User Commands"
+.SH NAME
+gitea-prune-orphans.sh \- remove Gitea mirror repositories no longer present on configured GitHub users
+.SH SYNOPSIS
+.B bash gitea-prune-orphans.sh
+.RI [ --dry ]
+.RI [ config.json ]
+.SH DESCRIPTION
+.B gitea-prune-orphans.sh
+scans mirror repositories in the configured Gitea user account, checks whether each repository exists under any configured GitHub user, and deletes mirrors that no longer exist upstream.
+.PP
+Only repositories identified as mirrors are considered.
+.SH OPTIONS
+.TP
+.B --dry
+Preview mode. Print mirrors that would be deleted without performing deletion.
+.TP
+.I config.json
+Optional path to configuration file. If omitted, defaults to
+.B config.json
+in the script directory.
+.SH CONFIGURATION
+The script reads these keys from the config file:
+.TP
+.B GITEA_URL
+Base URL of the Gitea instance.
+.TP
+.B GITEA_USER
+Owner account in Gitea to scan.
+.TP
+.B GITEA_TOKEN
+Gitea API token with repository delete permission.
+.TP
+.B GH_USERS
+Array of GitHub users/organizations used for orphan checks.
+.SH EXIT STATUS
+Returns 0 on completion. Returns 2 for missing prerequisites or invalid configuration. Returns 3 for repository-list API failures.
+.SH EXAMPLES
+Preview deletions only:
+.PP
+.B bash gitea-prune-orphans.sh --dry
+.PP
+Delete orphan mirrors using explicit config path:
+.PP
+.B bash gitea-prune-orphans.sh ./config.json
+.SH SEE ALSO
+.BR gitea-sync-all.sh (1),
+.BR git-mirror.sh (1)

@@ -1,0 +1,39 @@
+.TH GET-PREREQS.SH 1 "2026-04-25" "GitMirror" "User Commands"
+.SH NAME
+get-prereqs.sh \- install required tools for GitMirror scripts on Ubuntu/Debian
+.SH SYNOPSIS
+.B bash get-prereqs.sh
+.SH DESCRIPTION
+.B get-prereqs.sh
+checks for
+.B curl
+and
+.B jq
+and installs any missing package using
+.B apt-get
+with
+.B sudo
+.
+.PP
+The script is intended for Ubuntu/Debian systems and runs:
+.IP "1."
+.B sudo apt-get update
+.IP "2."
+.B sudo apt-get install -y curl
+or
+.B jq
+as needed.
+.PP
+When complete, it prints detected versions of both tools.
+.SH OPTIONS
+This command has no options.
+.SH EXIT STATUS
+Returns 0 on success. Exits non-zero if package installation fails or if commands cannot be executed.
+.SH EXAMPLES
+Install prerequisites for other GitMirror scripts:
+.PP
+.B bash get-prereqs.sh
+.SH SEE ALSO
+.BR apt-get (8),
+.BR curl (1),
+.BR jq (1)

@@ -1,0 +1,60 @@
+.TH GIT-MIRROR-GHTEST.SH 1 "2026-04-25" "GitMirror" "User Commands"
+.SH NAME
+git-mirror-ghtest.sh \- dry-run GitHub repository discovery for mirror input validation
+.SH SYNOPSIS
+.B bash git-mirror-ghtest.sh
+.RI [ github-user ... ]
+.SH DESCRIPTION
+.B git-mirror-ghtest.sh
+queries public repositories from the GitHub API and prints repositories that would be considered for mirroring.
+.PP
+Behavior summary:
+.IP "-"
+Uses command-line users when provided.
+.IP "-"
+If no users are provided, reads
+.B GH_USERS
+from
+.B config.json
+.
+.IP "-"
+Skips forked repositories.
+.IP "-"
+Skips repositories listed in
+.B GH_EXCLUDE_REPOS
+from
+.B config.json
+.
+.IP "-"
+Prints matching repositories with a check mark and excluded repositories with an exclusion marker.
+.PP
+This script does not create, clone, or sync repositories in Gitea.
+.SH OPTIONS
+No flags are supported.
+.PP
+Positional arguments:
+.TP
+.I github-user
+One or more GitHub usernames or organizations to inspect.
+.SH FILES
+.TP
+.B config.json
+Optional source of
+.B GH_USERS
+and
+.B GH_EXCLUDE_REPOS
+.
+.SH EXIT STATUS
+Returns 0 on normal completion. Returns 2 for invalid usage or missing prerequisites.
+.SH EXAMPLES
+Use configured users from config.json:
+.PP
+.B bash git-mirror-ghtest.sh
+.PP
+Check specific users:
+.PP
+.B bash git-mirror-ghtest.sh octocat github
+.SH SEE ALSO
+.BR git-mirror.sh (1),
+.BR curl (1),
+.BR jq (1)

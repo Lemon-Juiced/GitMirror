@@ -1,0 +1,24 @@
+.TH CHMODDER.SH 1 "2026-04-25" "GitMirror" "User Commands"
+.SH NAME
+chmodder.sh \- set executable permission on all .sh files in current directory
+.SH SYNOPSIS
+.B bash chmodder.sh
+.SH DESCRIPTION
+.B chmodder.sh
+iterates over all files matching
+.B *.sh
+in the current working directory and runs
+.B chmod +x
+on each regular file.
+.PP
+The script prints one status line per file changed.
+.SH OPTIONS
+This command has no options.
+.SH EXIT STATUS
+Returns 0 on success. Exits non-zero if an unexpected error occurs.
+.SH EXAMPLES
+Set executable permission on all shell scripts in the current directory:
+.PP
+.B bash chmodder.sh
+.SH SEE ALSO
+.BR chmod (1)

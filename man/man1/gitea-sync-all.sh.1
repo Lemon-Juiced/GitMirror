@@ -1,0 +1,43 @@
+.TH GITEA-SYNC-ALL.SH 1 "2026-04-25" "GitMirror" "User Commands"
+.SH NAME
+gitea-sync-all.sh \- trigger mirror sync for all mirror repositories in a Gitea user account
+.SH SYNOPSIS
+.B bash gitea-sync-all.sh
+.RI [ config.json ]
+.SH DESCRIPTION
+.B gitea-sync-all.sh
+enumerates repositories for the configured Gitea user, filters to mirror repositories, and calls the Gitea
+.B /mirror-sync
+API endpoint for each mirror.
+.PP
+The script prints per-repository results and a final run summary including attempted, synced, and failed counts.
+.SH OPTIONS
+.TP
+.I config.json
+Optional path to configuration file. Defaults to
+.B config.json
+in the current working directory.
+.SH CONFIGURATION
+The script reads these keys from the config file:
+.TP
+.B GITEA_URL
+Base URL of the Gitea instance.
+.TP
+.B GITEA_USER
+Gitea username whose repositories are scanned.
+.TP
+.B GITEA_TOKEN
+Gitea API token with permission to trigger mirror sync.
+.SH EXIT STATUS
+Returns 0 on completion. Returns 2 for missing prerequisites or invalid configuration. Returns 3 if repository listing fails.
+.SH EXAMPLES
+Sync all mirrors using default config file:
+.PP
+.B bash gitea-sync-all.sh
+.PP
+Sync all mirrors with an explicit config file:
+.PP
+.B bash gitea-sync-all.sh ./config.json
+.SH SEE ALSO
+.BR git-mirror.sh (1),
+.BR gitea-prune-orphans.sh (1)

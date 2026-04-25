@@ -1,0 +1,59 @@
+.TH GIT-MIRROR.SH 1 "2026-04-25" "GitMirror" "User Commands"
+.SH NAME
+git-mirror.sh \- mirror public GitHub repositories into a Gitea account
+.SH SYNOPSIS
+.B bash git-mirror.sh
+.SH DESCRIPTION
+.B git-mirror.sh
+reads settings from
+.B config.json
+and creates mirror repositories in Gitea using the Gitea migration API.
+.PP
+For each configured GitHub user, the script:
+.IP "-"
+Fetches public repositories from GitHub (paged requests).
+.IP "-"
+Skips repositories marked as forks.
+.IP "-"
+Skips repositories listed in
+.B GH_EXCLUDE_REPOS
+.
+.IP "-"
+Skips repositories that already exist in the target Gitea account.
+.IP "-"
+Creates mirror repositories for remaining entries.
+.SH CONFIGURATION
+The following keys are read from
+.B config.json
+:
+.TP
+.B GH_USERS
+Array of GitHub users/organizations to scan.
+.TP
+.B GH_EXCLUDE_REPOS
+Optional array of repository URLs to exclude.
+.TP
+.B GITEA_URL
+Base URL of the Gitea instance.
+.TP
+.B GITEA_USER
+Gitea username (may be required by related scripts).
+.TP
+.B GITEA_TOKEN
+Gitea API token with permission to create repositories.
+.SH OPTIONS
+This command has no options.
+.SH FILES
+.TP
+.B config.json
+Required configuration file in the current working directory.
+.SH EXIT STATUS
+Returns 0 on normal completion. Returns 2 for missing configuration or missing prerequisites.
+.SH EXAMPLES
+Mirror configured GitHub users into configured Gitea account:
+.PP
+.B bash git-mirror.sh
+.SH SEE ALSO
+.BR git-mirror-ghtest.sh (1),
+.BR gitea-sync-all.sh (1),
+.BR gitea-prune-orphans.sh (1)
