@@ -108,12 +108,10 @@ else
     -H "Content-Type: application/json" \
     "${API_BASE}/admin/users" \
     -d "{
-      \"login_name\": \"${NAME}\",
       \"username\": \"${NAME}\",
       \"email\": \"${EMAIL}\",
       \"password\": \"${PASSWORD}\",
-      \"must_change_password\": false,
-      \"source_id\": 0
+      \"must_change_password\": false
     }" \
     -w $'\n%{http_code}')
   body="${resp%$'\n'*}"
