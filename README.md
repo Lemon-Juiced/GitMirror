@@ -39,10 +39,12 @@ Example `config.json`:
 - Create a Gitea user account:  
   `bash gitea-create-owner.sh <name> [password] [email]`  
   - `<name>` is required.  
-  - `[password]` is optional, you will be prompted for one if omitted.  
+  - `[password]` is optional, you will be prompted for one if omitted. Passwords must be at least 8 characters.  
   - `[email]` is optional, defaults to `name@users.noreply.github.com` if omitted.  
 - Create a Gitea organisation:  
   `bash gitea-create-owner.sh -o <name>`  
+- Delete a Gitea user or organisation by name:  
+  `bash gitea-del-user.sh <name>`   
 - Remove mirror repos that no longer exist on GitHub:
   `bash gitea-prune-orphans.sh`
 - Preview orphan mirror deletions without deleting anything:

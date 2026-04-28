@@ -100,6 +100,11 @@ else
     echo "Error: a password is required to create a user account." >&2
     exit 2
   fi
+  # Gitea commonly enforces a minimum password length of 8.
+  if [ "${#PASSWORD}" -lt 8 ]; then
+    echo "Error: password must be at least 8 characters (Gitea rejected short passwords as PasswordIsRequired)." >&2
+    exit 2
+  fi
 
   [ -z "$EMAIL" ] && EMAIL="${NAME}@users.noreply.github.com"
 
@@ -121,6 +126,9 @@ else
     printf '\033[32m✓\033[0m User created: %s (%s)\n' "$NAME" "$EMAIL"
   else
     err=$(echo "$body" | jq -r '.message // .error // empty' 2>/dev/null || echo "$body")
+    if [ "$err" = "PasswordIsRequired" ] && [ -n "$PASSWORD" ]; then
+      err="Password was rejected by server policy (usually too short). Use at least 8 characters."
+    fi
     echo "Error creating user '${NAME}': ${err}" >&2
     exit 1
   fi

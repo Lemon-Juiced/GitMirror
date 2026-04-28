@@ -19,6 +19,8 @@ a user account is created. A password is required and will be prompted interacti
 .I name@users.noreply.github.com
 when not provided.
 .PP
+Passwords for user creation must be at least 8 characters.
+.PP
 With
 .BR \-o ,
 an organisation is created. No password or email is required.
@@ -34,7 +36,7 @@ Username or organisation name to create.
 .I password
 Password for the new user account. Prompted securely if omitted. Not used when
 .B \-o
-is set.
+is set. Must be at least 8 characters.
 .TP
 .I email
 Email address for the new user account. Defaults to
