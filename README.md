@@ -36,6 +36,13 @@ Example `config.json`:
   If you omit `<github_usernames>` the test script will read `GH_USERS` from `config.json`.  
 - Sync all mirrored repositories for a user on Gitea:  
   `bash gitea_sync_all.sh`
+- Create a Gitea user account:  
+  `bash gitea-create-owner.sh <name> [password] [email]`  
+  - `<name>` is required.  
+  - `[password]` is optional, you will be prompted for one if omitted.  
+  - `[email]` is optional, defaults to `name@users.noreply.github.com` if omitted.  
+- Create a Gitea organisation:  
+  `bash gitea-create-owner.sh -o <name>`  
 - Remove mirror repos that no longer exist on GitHub:
   `bash gitea-prune-orphans.sh`
 - Preview orphan mirror deletions without deleting anything:
@@ -54,7 +61,7 @@ It does **not** clone, create, or sync mirrors in Gitea.
 
 ## Notes
 - The GitHub API has rate limits for unauthenticated requests, so this can fail.  
-- Keep `GITEA_TOKEN` secret — **DO NOT** commit it to version control. (This is why config.json is in .gitignore).
+- Keep `GITEA_TOKEN` secret! — **DO NOT** commit it to version control. (This is why config.json is in .gitignore).
   
 ### Optional: Man Pages
 The primary way to use Git Mirror is still running the scripts directly as shown above.

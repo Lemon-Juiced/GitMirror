@@ -1,0 +1,68 @@
+.TH GITEA-CREATE-OWNER.SH 1 "2026-04-28" "GitMirror" "User Commands"
+.SH NAME
+gitea-create-owner.sh \- create a user account or organisation on a Gitea instance
+.SH SYNOPSIS
+.B bash gitea-create-owner.sh
+.RB [ \-o ]
+.I name
+.RI [ password ]
+.RI [ email ]
+.SH DESCRIPTION
+.B gitea-create-owner.sh
+creates a new user account or organisation on a Gitea instance.
+.PP
+If the user or organisation name is already taken, the script exits with an error and does not attempt to recreate it.
+.PP
+Without
+.BR \-o ,
+a user account is created. A password is required and will be prompted interactively if not supplied as a positional argument. The email address defaults to
+.I name@users.noreply.github.com
+when not provided.
+.PP
+With
+.BR \-o ,
+an organisation is created. No password or email is required.
+.SH OPTIONS
+.TP
+.B \-o
+Create an organisation instead of a user account.
+.SH ARGUMENTS
+.TP
+.I name
+Username or organisation name to create.
+.TP
+.I password
+Password for the new user account. Prompted securely if omitted. Not used when
+.B \-o
+is set.
+.TP
+.I email
+Email address for the new user account. Defaults to
+.IR name @users.noreply.github.com .
+Not used when
+.B \-o
+is set.
+.SH CONFIGURATION
+.TP
+.B GITEA_URL
+Base URL of the Gitea instance.
+.TP
+.B GITEA_TOKEN
+Gitea API token. Creating a user account requires an admin-level token.
+.SH EXIT STATUS
+Returns 0 on success. Returns 1 if the user or organisation already exists. Returns 2 for invalid usage, missing prerequisites, or missing configuration.
+.SH EXAMPLES
+Create a user account, prompting for password:
+.PP
+.B bash gitea-create-owner.sh alice
+.PP
+Create a user account with password and custom email:
+.PP
+.B bash gitea-create-owner.sh alice s3cr3t alice@example.com
+.PP
+Create an organisation:
+.PP
+.B bash gitea-create-owner.sh \-o my-org
+.SH SEE ALSO
+.BR git-mirror.sh (1),
+.BR gitea-sync-all.sh (1)
